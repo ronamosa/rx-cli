@@ -4,6 +4,35 @@
 
 ### NMAP
 
+scan ports ALL:
+
 `nmap -v -Pn -p- --min-rate=5000 -o nmap-{{.Name}}.txt {{.IPAddress}}`
 
+scan version, OS:
+
 `nmap -v -Pn -p- -sC -sV -O --min-rate=5000 -o nmap-{{.Name}}.txt {{.IPAddress}}`
+
+vuln scan ALL:
+
+`nmap -v -Pn -p- -sV --script vuln* -o nmap-{{.Name}}.txt {{.IPAddress}}`
+
+samba enum, vuln:
+
+`nmap -v -Pn -p 139,445 --script smb-enum-shares {{.IPAddress}}`
+
+`nmap -v -Pn -p 139,445 --script smb-vuln* {{.IPAddress}}`
+
+### GOBUSTER / FEROXBUSTER
+
+general enumeration:
+
+`gobuster dir -e -u http://{{.IPAddress}} -w $WORDLIST -o gobuster-{{.Name}}.txt`
+
+add `-k` for `https`
+
+extension scan:
+
+`gobuster dir -x cgi,php,sh,log, -u http://{{.IPAddress}}/cgi-bin/ -w $WORDLIST`
+
+[ ] `/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt`
+[ ] `/usr/share/wordlists/SecLists/Discovery/Web-Content/raft-*`

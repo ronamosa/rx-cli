@@ -5,7 +5,6 @@ Copyright © 2022 RAMOSA <ron@cloudbuilder.io>
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -22,24 +21,24 @@ type Target struct {
 
 // notesCmd represents the notes command
 var notesCmd = &cobra.Command{
-	Use:   "notes",
+	Use:   "notes <name> <ip-address>",
 	Short: "create new notes markdown with templates.",
-	Long: `Create a new markdown notes file for HTB or THM
-and quickly get into hacking, For example:
+	Long: `
 
-rx notes add <box> <ip-address>`,
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) != 2 {
-			fmt.Println("len=", len(args))
-			return errors.New("requires 2 args: <name> <ip-address>")
-		}
-		return nil
-	},
-
+	██████╗ ██╗  ██╗██╗  ██╗ █████╗  ██████╗██╗  ██╗
+	██╔══██╗╚██╗██╔╝██║  ██║██╔══██╗██╔════╝██║ ██╔╝
+	██████╔╝ ╚███╔╝ ███████║███████║██║     █████╔╝ 
+	██╔══██╗ ██╔██╗ ██╔══██║██╔══██║██║     ██╔═██╗ 
+	██║  ██║██╔╝ ██╗██║  ██║██║  ██║╚██████╗██║  ██╗
+	╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝	
+	`,
+	Args: cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
+
 		// assign vars
 		projectName := args[0]
 		targetIP := args[1]
+
 		// parse the ip address
 		addr := net.ParseIP(targetIP)
 
@@ -68,8 +67,10 @@ rx notes add <box> <ip-address>`,
 
 			// create notes markdown
 			target := Target{projectName, targetIP}
-			template, _ := template.ParseFiles("notes.tmpl")
-			template.Execute(os.Stdout, target)
+			template := template.Must(template.ParseFiles("/home/rxnamxsa/.config/rx/templates/notes.tmpl"))
+			// write to file
+			file, _ := os.Create(projectName + "/" + "notes-" + projectName + ".md")
+			template.Execute(file, target)
 		}
 	},
 }
@@ -81,9 +82,15 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	notesCmd.PersistentFlags().String("foo", "", "A help for foo")
+	//notesCmd.PersistentFlags().String("foo", "", "A help for foo")
+	//notesCmd.PersistentFlags().String("name", "", "name of the project, box, room.")
+	//notesCmd.PersistentFlags().String("ip", "", "ip address of the target, for the room.")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	notesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//notesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	// Marking Flags Required
+	//notesCmd.MarkPersistentFlagRequired("name")
+	//notesCmd.MarkPersistentFlagRequired("ip")
 }

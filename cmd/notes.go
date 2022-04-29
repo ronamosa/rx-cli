@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"rx/cmd/util"
+	"strings"
 	"text/template"
 
 	"github.com/spf13/cobra"
@@ -57,10 +58,10 @@ var notesCmd = &cobra.Command{
 		if fileExists {
 			fmt.Println("File exists:", projectName)
 		} else {
-			fmt.Println("Creating directory:", projectName)
+			fmt.Println("Creating directory:", strings.ToUpper(projectName))
 
 			// create directory
-			_, err := util.CreateFolder(projectName)
+			_, err := util.CreateFolder(strings.ToUpper(projectName))
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -68,8 +69,9 @@ var notesCmd = &cobra.Command{
 			// create notes markdown
 			target := Target{projectName, targetIP}
 			template := template.Must(template.ParseFiles("/home/rxnamxsa/.config/rx/templates/notes.tmpl"))
+
 			// write to file
-			file, _ := os.Create(projectName + "/" + "notes-" + projectName + ".md")
+			file, _ := os.Create(strings.ToUpper(projectName) + "/" + "notes-" + projectName + ".md")
 			template.Execute(file, target)
 		}
 	},

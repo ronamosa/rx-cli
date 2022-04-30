@@ -5,6 +5,7 @@ Copyright © 2022 RAMOSA <ron@cloudbuilder.io>
 package cmd
 
 import (
+	"embed"
 	"fmt"
 	"net"
 	"os"
@@ -19,6 +20,9 @@ type Target struct {
 	Name      string
 	IPAddress string
 }
+
+//go:embed templates/*
+var tmplFS embed.FS
 
 // notesCmd represents the notes command
 var notesCmd = &cobra.Command{
@@ -68,9 +72,10 @@ var notesCmd = &cobra.Command{
 
 			// create notes markdown
 			target := Target{projectName, targetIP}
-			template := template.Must(template.ParseFiles("/home/rxnamxsa/.config/rx/templates/notes.tmpl"))
+			template := template.Must(template.ParseFS(tmplFS, "templates/notes.tmpl"))
 
 			// write to file
+			fmt.Println("Creating notes file:", strings.ToUpper(projectName)+"/"+"notes-"+projectName+".md")
 			file, _ := os.Create(strings.ToUpper(projectName) + "/" + "notes-" + projectName + ".md")
 			template.Execute(file, target)
 		}

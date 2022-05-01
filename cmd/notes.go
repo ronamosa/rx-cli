@@ -41,7 +41,7 @@ var notesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// assign vars
-		projectName := args[0]
+		projectName := strings.ToUpper(args[0])
 		targetIP := args[1]
 
 		// parse the ip address
@@ -53,37 +53,50 @@ var notesCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// check if the folder we want to create already exists
-		fileExists, err := util.FileExists(projectName)
-		if err != nil {
-			fmt.Println(err)
-		}
-		// if it doesn't exist, create it.
-		if fileExists {
-			fmt.Println("File exists:", projectName)
+		notes, _ := createNotes(projectName, targetIP)
+		if notes {
+			fmt.Println("Create Successful.")
 		} else {
-			fmt.Println("Creating directory:", strings.ToUpper(projectName))
-
-			// create directory
-			_, err := util.CreateFolder(strings.ToUpper(projectName))
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			// create notes markdown
-			target := Target{projectName, targetIP}
-			template := template.Must(template.ParseFS(tmplFS, "templates/notes.tmpl"))
-
-			// write to file
-			fmt.Println("Creating notes file:", strings.ToUpper(projectName)+"/"+"notes-"+projectName+".md")
-			file, _ := os.Create(strings.ToUpper(projectName) + "/" + "notes-" + projectName + ".md")
-			template.Execute(file, target)
+			fmt.Println("Create Failed. Check errors.")
 		}
 	},
 }
 
+func createNotes(name string, ipaddress string) (bool, error) {
+
+	// check if folder already exists
+	fileExists, err := util.FileExists(name)
+	if err != nil {
+		return false, err
+	}
+	if fileExists {
+		fmt.Printf("Folder %v already exists\n", name)
+		return false, err
+	} else {
+		// create directory
+		_, err := util.CreateFolder(strings.ToUpper(name))
+		if err != nil {
+			//fmt.Println(err)
+			return false, err
+		}
+		// create notes markdown
+		target := Target{name, ipaddress}
+		notes_tmpl := template.Must(template.ParseFS(tmplFS, "templates/notes.tmpl"))
+		fmt.Println("Creating new notes file:", strings.ToUpper(name)+"/"+"notes-"+name+".md...")
+		file, err := os.Create(strings.ToUpper(name) + "/" + "notes-" + name + ".md")
+		if err != nil {
+			fmt.Println(err)
+			return false, nil
+		} else {
+			notes_tmpl.Execute(file, target)
+			return true, nil
+		}
+	}
+}
+
 func init() {
 	createCmd.AddCommand(notesCmd)
+	updateCmd.AddCommand(notesCmd)
 
 	// Here you will define your flags and configuration settings.
 

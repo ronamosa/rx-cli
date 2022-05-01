@@ -96,7 +96,6 @@ func createNotes(name string, ipaddress string) (bool, error) {
 
 func init() {
 	createCmd.AddCommand(notesCmd)
-	updateCmd.AddCommand(notesCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -105,6 +104,7 @@ func init() {
 	//notesCmd.PersistentFlags().String("foo", "", "A help for foo")
 	//notesCmd.PersistentFlags().String("name", "", "name of the project, box, room.")
 	//notesCmd.PersistentFlags().String("ip", "", "ip address of the target, for the room.")
+	notesCmd.PersistentFlags().StringP("add", "a", "", "add a section to the notes")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

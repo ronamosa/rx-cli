@@ -38,3 +38,36 @@ Wordlists:
 
 * [ ] `/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt`
 * [ ] `/usr/share/wordlists/SecLists/Discovery/Web-Content/raft-*`
+
+## REVERSE SHELLS
+
+
+### Upgrade your shell
+
+Python:
+
+```bash
+which python 
+python -c 'import pty; pty.spawn("/bin/bash")'
+```
+
+Bash:
+
+```bash
+SHELL=/bin/bash script -q /dev/null
+```
+
+STTY:
+
+1. `ctrl-z` to background your reverse shell
+2. attack machine: `stty raw -echo` to send control characters through the reverse shell
+3. attack machine: `stty size` and take note of rows & cols
+4. `fg` to foreground your reverse shell again
+
+finally, on target:
+
+```bash
+export SHELL=bash
+stty rows $x columns $y #Set remote shell to x number of rows & y columns
+export TERM=xterm-256color #allows you to clear console, and have color output
+```

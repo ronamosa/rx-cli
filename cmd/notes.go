@@ -74,10 +74,18 @@ func createNotes(name string, ipaddress string) (bool, error) {
 			//fmt.Println(err)
 			return false, err
 		}
-		// create notes markdown
-		target := Target{name, ipaddress}
+
+		// create target struct
+		target := Target{
+			Name:      name,
+			IPAddress: ipaddress,
+			Port:      "",
+		}
+
 		notes_tmpl := template.Must(template.ParseFS(tmplFS, "templates/notes.tmpl"))
+
 		fmt.Println("Creating new notes file:", strings.ToUpper(name)+"/"+"notes-"+name+".md...")
+
 		file, err := os.Create(strings.ToUpper(name) + "/" + "notes-" + name + ".md")
 		if err != nil {
 			fmt.Println(err)

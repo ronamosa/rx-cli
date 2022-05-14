@@ -16,11 +16,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Target struct {
-	Name      string
-	IPAddress string
-}
-
 //go:embed templates/*
 var tmplFS embed.FS
 
@@ -53,11 +48,11 @@ var notesCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		notes, _ := createNotes(projectName, targetIP)
-		if notes {
-			fmt.Println("Create Successful.")
+		_, err := createNotes(projectName, targetIP)
+		if err != nil {
+			fmt.Println("Create Failed: ", err)
 		} else {
-			fmt.Println("Create Failed. Check errors.")
+			fmt.Println("Create Successful.")
 		}
 	},
 }

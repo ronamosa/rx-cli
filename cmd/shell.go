@@ -5,19 +5,15 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
-// declare target struct here
-type Target struct {
-	Name      string
-	IPAddress string
-}
-
-// createCmd represents the create command
-var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "creates [available] things for you...",
+// shellCmd represents the shell command
+var shellCmd = &cobra.Command{
+	Use:   "shell <type> ",
+	Short: "create shells for use.",
 	Long: `
 
 	██████╗ ██╗  ██╗██╗  ██╗ █████╗  ██████╗██╗  ██╗
@@ -28,18 +24,21 @@ var createCmd = &cobra.Command{
 	╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝	
 	`,
 	Args: cobra.MinimumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("shell called")
+	},
 }
 
 func init() {
-	rootCmd.AddCommand(createCmd)
+	createCmd.AddCommand(shellCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	//createCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// shellCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	//createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// shellCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

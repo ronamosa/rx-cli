@@ -6,6 +6,8 @@ package cmd
 
 import (
 	"fmt"
+	"net"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -26,18 +28,28 @@ var shellCmd = &cobra.Command{
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
-		shellType := args[0]
-		LHOST := "192.168.1.2"
-		LPORT := "443"
+		LHOST, _ := cmd.Flags().GetString("LHOST")
+		LPORT, _ := cmd.Flags().GetString("LPORT")
+
+		// parse the ip address
+		addr := net.ParseIP(LHOST)
+
+		// check if ip is valid
+		if addr == nil {
+			fmt.Println("Invalid address:", LHOST)
+			os.Exit(1)
+		}
+
+		shell := args[0]
 
 		switch {
-		case shellType == "php":
+		case shell == "php":
 			createPhpSh(LHOST, LPORT)
-		case shellType == "py":
+		case shell == "py":
 			createPySh(LHOST, LPORT)
-		case shellType == "bash":
+		case shell == "bash":
 			createBashSh(LHOST, LPORT)
-		case shellType == "bin":
+		case shell == "bin":
 			createBinSh(LHOST, LPORT)
 		default:
 			fmt.Println("Did you select an available shell?")
@@ -72,9 +84,12 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// shellCmd.PersistentFlags().String("foo", "", "A help for foo")
+	shellCmd.PersistentFlags().String("LHOST", "", "ipaddress of the listening machine")
+	shellCmd.PersistentFlags().String("LPORT", "", "port of the listening machine")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// shellCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//shellCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	shellCmd.MarkPersistentFlagRequired("LHOST")
+	shellCmd.MarkPersistentFlagRequired("LPORT")
 }

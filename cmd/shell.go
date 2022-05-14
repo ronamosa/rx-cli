@@ -12,7 +12,7 @@ import (
 
 // shellCmd represents the shell command
 var shellCmd = &cobra.Command{
-	Use:   "shell <type> ",
+	Use:   "shell <type>",
 	Short: "create shells for use.",
 	Long: `
 
@@ -25,8 +25,44 @@ var shellCmd = &cobra.Command{
 	`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("shell called")
+
+		shellType := args[0]
+		LHOST := "192.168.1.2"
+		LPORT := "443"
+
+		switch {
+		case shellType == "php":
+			createPhpSh(LHOST, LPORT)
+		case shellType == "py":
+			createPySh(LHOST, LPORT)
+		case shellType == "bash":
+			createBashSh(LHOST, LPORT)
+		case shellType == "bin":
+			createBinSh(LHOST, LPORT)
+		default:
+			fmt.Println("Did you select an available shell?")
+		}
 	},
+}
+
+func createPhpSh(ipaddress string, port string) (bool, error) {
+	fmt.Printf("PHP shell for %v:%s", ipaddress, port)
+	return true, nil
+}
+
+func createPySh(ipaddress string, port string) (bool, error) {
+	fmt.Printf("Python shell for %v:%s", ipaddress, port)
+	return true, nil
+}
+
+func createBashSh(ipaddress string, port string) (bool, error) {
+	fmt.Printf("Bash shell for %v:%s ", ipaddress, port)
+	return true, nil
+}
+
+func createBinSh(ipaddress string, port string) (bool, error) {
+	fmt.Printf("Bin shell for %v:%s", ipaddress, port)
+	return true, nil
 }
 
 func init() {

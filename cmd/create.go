@@ -8,6 +8,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// declare target struct here
+type Target struct {
+	Name      string
+	IPAddress string
+}
+
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",

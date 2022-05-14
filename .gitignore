@@ -5,6 +5,10 @@
 *.so
 *.dylib
 
+# test files to ignore
+*.php
+*.py
+
 # Test binary, built with `go test -c`
 *.test
 

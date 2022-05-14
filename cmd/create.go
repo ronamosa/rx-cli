@@ -12,6 +12,7 @@ import (
 type Target struct {
 	Name      string
 	IPAddress string
+	Port      string
 }
 
 // createCmd represents the create command

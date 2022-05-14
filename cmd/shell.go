@@ -5,12 +5,17 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"embed"
 	"fmt"
 	"net"
 	"os"
+	"text/template"
 
 	"github.com/spf13/cobra"
 )
+
+//go:embed templates/shells
+var shellFS embed.FS
 
 // shellCmd represents the shell command
 var shellCmd = &cobra.Command{
@@ -59,7 +64,27 @@ var shellCmd = &cobra.Command{
 
 func createPhpSh(ipaddress string, port string) (bool, error) {
 	fmt.Printf("PHP shell for %v:%s", ipaddress, port)
-	return true, nil
+	tmpl := template.Must(template.ParseFS(shellFS, "templates/shells/php/sh.tmpl"))
+
+	// create output file
+	file, err := os.Create("shell.php")
+
+	// create target struct
+	target := Target{
+		Name:      "",
+		IPAddress: ipaddress,
+		Port:      port,
+	}
+
+	// check for errors
+	if err != nil {
+		fmt.Println(err)
+		return false, nil
+	} else {
+		// create shell
+		tmpl.Execute(file, target)
+		return true, nil
+	}
 }
 
 func createPySh(ipaddress string, port string) (bool, error) {

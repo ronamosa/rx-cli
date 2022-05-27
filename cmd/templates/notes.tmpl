@@ -166,7 +166,9 @@ export TERM=xterm-256color #allows you to clear console, and have color output
 
 * [ ] `sudo -l`
 * [ ] `find / -user $username` - find everything this user owns.
-* [ ] `find -perms /4000 2>/dev/null` find suids
+* [ ] `find / -perm /4000 2>/dev/null` find suids
+* [ ] credentail re-use -- logins? SSH? re-try existing creds against all logins.
+
 
 Other finds:
 
@@ -217,3 +219,6 @@ sudo python -c 'import os; os.system("/bin/sh")'
 ```bash
 
 ```
+
+## LESSONS LEARNED
+

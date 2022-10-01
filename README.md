@@ -8,7 +8,7 @@ A command-line "helper" tool to create folders, notes, generate shells and other
 
 ## rx why?
 
-Doing hacking challenges repeatedly and locating and copying pasting commands (if I could find them) to the new challenge was getting tediuous. I wanted a tool that could just create the folders and files, in a consistent format, I needed, with some extra functionality for things like nmap lines, gobuster lines, 
+While doing HTB challenges I found myself copying and pasting things over and over again just to get started on the new box, or go digging through notes or sites for a one-liner I had used many times before. I wanted a simple tool to generate my notes document from a template, with all the standard nmap, gobuster and reverse shell info as my starting point.
 
 <!-- tocstop -->
 
@@ -17,16 +17,13 @@ Doing hacking challenges repeatedly and locating and copying pasting commands (i
 ## Usage & Installation
 
 <!-- usage -->
-**Install via pip**
-
-```bash
-install command goes here.
-```
-
 **Install via Github**
 
 ```bash
-clone and command output goes here
+git clone https://github.com/ronamosa/rx-cli.git
+
+go build
+go install
 ```
 <!-- usagestop -->
 
@@ -35,7 +32,8 @@ clone and command output goes here
 <!-- commands -->
 
 ```bash
-all subcommand options details go here
+# create markdown notes file.
+rx create <name> <target-ip>
 ```
 
 ## Logo Font Options

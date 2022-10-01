@@ -20,9 +20,13 @@ While doing HTB challenges I found myself copying and pasting things over and ov
 **Install via Github**
 
 ```bash
+# clone repo
 git clone https://github.com/ronamosa/rx-cli.git
 
+# build binary - 'rx'
 go build
+
+# (optional) install 'rx' binary to your system
 go install
 ```
 <!-- usagestop -->
@@ -35,6 +39,19 @@ go install
 # create markdown notes file.
 rx create <name> <target-ip>
 ```
+
+Example output: `rx create notes Test 127.0.0.1`
+
+![rx-create-notes](docs/img/rx-create-notes.png)
+
+```bash
+# create reverse shell in PHP
+rx create shell <type> --LHOST <listener ip> --LPORT <listener port>
+```
+
+Example output: `rx create shell php --LHOST 127.0.0.1 --LPORT 4444`
+
+![rx-create-shell](docs/img/rx-create-shell-php.png)
 
 ## Logo Font Options
 

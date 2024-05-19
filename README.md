@@ -31,8 +31,48 @@ go install
 ```
 <!-- usagestop -->
 
-## Commands
 
+## Implentation on Ubuntu 22.04 
+- Installing the Go language support currently there is no APT application for Go install but your can acheive this using **Snap** in Ubuntu. 
+
+**Command for setting this up**
+```bash 
+sudo snap install go --classic 
+
+```
+- Once you have "GO" installed on Ubuntu you can now CD to the directory which you have cloned the repo on to.
+- Once in this directory you can either run the Program with go by doing the following. 
+```bash 
+go run main.go       # remember running this will just run the program 
+
+# example  
+go run main.go create notes [NAME_OF_THE_NOTE] [IP_ADDRESS_OF_TARGET]  #change relatively 
+
+# Usage example 
+go run main.go create notes targettest_tomatocompany 212.23.45.200  #Notes for Attack Vectors automated
+
+```
+**Using the Binary**
+- The only good thing about build the binary of the ```main.go``` program is that it makes it faster to excute. The following command will do this building. 
+```bash 
+go build .   #note that the . denotes in linux the current directory 
+
+# - note that this will build the binary 
+# - so the binary name will be rx-cl using the information we has noted above 
+# - we change the "go run main.go" with rx 
+
+#example 
+rx create notes [NAME_OF_THE_NOTE] [IP_ADDRESS_OF_TARGET]  #change relatively
+
+#Usage example
+rx create notes targettest_tomatocompany 212.23.45.200  #Notes for Attack Vectors automated
+
+```
+
+- Additional Commands are provided below for more help. 
+
+
+## Commands
 <!-- commands -->
 
 ```bash

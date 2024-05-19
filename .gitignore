@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+rx
 
 # test files to ignore
 *.php

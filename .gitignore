@@ -18,3 +18,10 @@ rx
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+
+# Add This Prefix to for testing Note creations 
+# - If testing rx create notes xt_somerandomstring IP 
+# - This way it is automaticly ignored.
+
+XT*/

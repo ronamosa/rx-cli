@@ -12,6 +12,7 @@ import (
 	"rx/cmd/util"
 	"strings"
 	"text/template"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -69,7 +70,7 @@ func createNotes(name string, ipaddress string) (bool, error) {
 		return false, err
 	} else {
 		// create directory
-		_, err := util.CreateFolder(strings.ToUpper(name))
+		_, err := util.CreateFolder("NOTE_OPD/"+strings.ToUpper(name))
 		if err != nil {
 			//fmt.Println(err)
 			return false, err
@@ -82,11 +83,19 @@ func createNotes(name string, ipaddress string) (bool, error) {
 			Port:      "",
 		}
 
+		parentDir := "NOTE_OPD/"
 		notes_tmpl := template.Must(template.ParseFS(tmplFS, "templates/notes.tmpl"))
 
-		fmt.Println("Creating new notes file:", strings.ToUpper(name)+"/"+"notes-"+name+".md...")
+		fmt.Println("Creating new notes file:", parentDir+strings.ToUpper(name)+"/"+"notes-"+name+".md...")
 
-		file, err := os.Create(strings.ToUpper(name) + "/" + "notes-" + name + ".md")
+		// Defining the File Creation Part and storeing the file 
+		// 
+		subDir := strings.ToUpper(name) + "/"
+		fileName := "notes-" + name + ".md"
+		filePath := filepath.Join(parentDir, subDir, fileName)
+	    file, err := os.Create(filePath)
+
+
 		if err != nil {
 			fmt.Println(err)
 			return false, nil

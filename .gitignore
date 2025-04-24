@@ -18,3 +18,15 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 rx
+
+# Build artifacts
+rx_*
+*.exe
+/dist
+*.zip
+
+# Generated shell files
+shell.php
+shell.py
+shell.sh
+revshell.c

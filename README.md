@@ -17,7 +17,26 @@ While doing HTB challenges I found myself copying and pasting things over and ov
 ## Usage & Installation
 
 <!-- usage -->
-**Install via Github**
+**Install from Binary Release (Recommended)**
+
+Download the pre-compiled binary for your platform from the [Releases page](https://github.com/ronamosa/rx-cli/releases).
+
+```bash
+# Download the latest release for your platform
+# Example for Linux (amd64)
+wget https://github.com/ronamosa/rx-cli/releases/latest/download/rx_linux_amd64.zip
+
+# Extract the binary
+unzip rx_linux_amd64.zip
+
+# Make it executable
+chmod +x rx_linux_amd64
+
+# Optional: Move to a directory in your PATH for easier access
+sudo mv rx_linux_amd64 /usr/local/bin/rx
+```
+
+**Build from Source**
 
 ```bash
 # clone repo
@@ -30,7 +49,7 @@ go build
 go install
 ```
 
-**Using Makefile (recommended)**
+**Using Makefile**
 
 ```bash
 # clone repo
@@ -136,3 +155,5 @@ Example: `rx create shell php --LHOST 127.0.0.1 --LPORT 4444`
 - Added Makefile for consistent builds and multi-platform releases
 - Improved error handling and output messages
 - Made Python and Bash shells executable upon creation
+- Improved CLI help text with better documentation and examples
+- Added binary releases for easy installation without compiling

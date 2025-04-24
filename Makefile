@@ -4,7 +4,6 @@
 BINARY_NAME=rx
 VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 BUILD_TIME=$(shell date -u '+%Y-%m-%d %H:%M:%S')
-LDFLAGS=-ldflags "-X rx/main.Version=$(VERSION) -X rx/main.BuildTime=$(BUILD_TIME)"
 
 # Default OS and Architecture
 GOOS?=$(shell go env GOOS)
@@ -23,19 +22,19 @@ deps:
 # Build the binary
 build: deps
 	@echo "Building $(BINARY_NAME)..."
-	go build $(LDFLAGS) -o $(BINARY_NAME)
+	go build -o $(BINARY_NAME)
 
 # Build for multiple platforms
 release:
 	@echo "Building release binaries..."
-	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o $(BINARY_NAME)_linux_amd64
-	GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o $(BINARY_NAME)_darwin_amd64
-	GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o $(BINARY_NAME)_windows_amd64.exe
+	GOOS=linux GOARCH=amd64 go build -o $(BINARY_NAME)_linux_amd64
+	GOOS=darwin GOARCH=amd64 go build -o $(BINARY_NAME)_darwin_amd64
+	GOOS=windows GOARCH=amd64 go build -o $(BINARY_NAME)_windows_amd64.exe
 
 # Install the binary to GOPATH/bin
 install: build
 	@echo "Installing $(BINARY_NAME)..."
-	go install $(LDFLAGS)
+	go install
 
 # Run tests
 test:

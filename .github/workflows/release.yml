@@ -21,20 +21,14 @@ jobs:
           go-version: '1.18'
           check-latest: true
 
-      - name: Get release version
-        id: get_version
-        run: |
-          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          echo "BUILD_TIME=$(date -u +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
-
       - name: Build for all platforms
         run: |
           mkdir -p dist
-          GOOS=linux GOARCH=amd64 go build -ldflags "-X rx/main.Version=${{ env.VERSION }} -X rx/main.BuildTime=${{ env.BUILD_TIME }}" -o dist/rx_linux_amd64
-          GOOS=linux GOARCH=arm64 go build -ldflags "-X rx/main.Version=${{ env.VERSION }} -X rx/main.BuildTime=${{ env.BUILD_TIME }}" -o dist/rx_linux_arm64
-          GOOS=darwin GOARCH=amd64 go build -ldflags "-X rx/main.Version=${{ env.VERSION }} -X rx/main.BuildTime=${{ env.BUILD_TIME }}" -o dist/rx_darwin_amd64
-          GOOS=darwin GOARCH=arm64 go build -ldflags "-X rx/main.Version=${{ env.VERSION }} -X rx/main.BuildTime=${{ env.BUILD_TIME }}" -o dist/rx_darwin_arm64
-          GOOS=windows GOARCH=amd64 go build -ldflags "-X rx/main.Version=${{ env.VERSION }} -X rx/main.BuildTime=${{ env.BUILD_TIME }}" -o dist/rx_windows_amd64.exe
+          GOOS=linux GOARCH=amd64 go build -o dist/rx_linux_amd64
+          GOOS=linux GOARCH=arm64 go build -o dist/rx_linux_arm64
+          GOOS=darwin GOARCH=amd64 go build -o dist/rx_darwin_amd64
+          GOOS=darwin GOARCH=arm64 go build -o dist/rx_darwin_arm64
+          GOOS=windows GOARCH=amd64 go build -o dist/rx_windows_amd64.exe
 
       - name: Zip binaries
         run: |

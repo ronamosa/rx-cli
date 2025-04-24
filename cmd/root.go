@@ -9,6 +9,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Version holds the current version
+var (
+	version   = "dev"
+	buildTime = "unknown"
+)
+
+// SetVersionInfo allows setting version information from main
+func SetVersionInfo(v, bt string) {
+	version = v
+	buildTime = bt
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "rx",
@@ -25,15 +37,18 @@ Examples:
 	CompletionOptions: cobra.CompletionOptions{
 		DisableDefaultCmd: true,
 	},
-	Version: "0.0.2",
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Version: "0.0.2", // This will be overridden by the version variable
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	// Set version info from variables
+	rootCmd.Version = version
+	rootCmd.SetVersionTemplate(`Version:    {{.Version}}
+Build Time: ` + buildTime + `
+`)
+
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)

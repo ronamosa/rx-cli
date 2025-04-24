@@ -29,6 +29,22 @@ go build
 # (optional) install 'rx' binary to your system
 go install
 ```
+
+**Using Makefile (recommended)**
+
+```bash
+# clone repo
+git clone https://github.com/ronamosa/rx-cli.git
+
+# build binary - 'rx'
+make build
+
+# install binary to your system
+make install
+
+# build for multiple platforms
+make release
+```
 <!-- usagestop -->
 
 ## Commands
@@ -36,20 +52,26 @@ go install
 <!-- commands -->
 
 ```bash
-# create markdown notes file.
-rx create <name> <target-ip>
+# create markdown notes file
+rx create notes <target-name> <target-ip>
 ```
 
-Example output: `rx create notes Test 127.0.0.1`
+Example: `rx create notes Test 127.0.0.1`
 
 ![rx-create-notes](docs/img/rx-create-notes.png)
 
 ```bash
-# create reverse shell in PHP
+# create reverse shells (php, python, bash, binary)
 rx create shell <type> --LHOST <listener ip> --LPORT <listener port>
 ```
 
-Example output: `rx create shell php --LHOST 127.0.0.1 --LPORT 4444`
+**Available shell types:**
+- `php` - Creates a PHP reverse shell
+- `python` or `py` - Creates a Python reverse shell
+- `bash` - Creates a Bash reverse shell
+- `bin` - Creates a C source file for compilation into a binary reverse shell
+
+Example: `rx create shell php --LHOST 127.0.0.1 --LPORT 4444`
 
 ![rx-create-shell](docs/img/rx-create-shell-php.png)
 
@@ -106,3 +128,11 @@ Example output: `rx create shell php --LHOST 127.0.0.1 --LPORT 4444`
                                 @%                                        
                               :"                                          
 ```
+
+## Recent Updates
+
+### v0.0.2
+- Added support for all shell types (Python, Bash, Binary/C source)
+- Added Makefile for consistent builds and multi-platform releases
+- Improved error handling and output messages
+- Made Python and Bash shells executable upon creation

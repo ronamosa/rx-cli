@@ -2,8 +2,8 @@
 
 ## High Priority
 
-- [ ] Complete shell implementations (Python, Bash, Bin shells)
-- [ ] Add a Makefile for consistent Go builds
+- [x] Complete shell implementations (Python, Bash, Bin shells)
+- [x] Add a Makefile for consistent Go builds
 - [ ] Add Web Reconnaissance Command to automate common recon tools
 
 ## Medium Priority

@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 RAMOSA <ron@cloudbuilder.io>
-
 */
 package cmd
 
@@ -21,17 +20,23 @@ var tmplFS embed.FS
 
 // notesCmd represents the notes command
 var notesCmd = &cobra.Command{
-	Use:   "notes <name> <ip-address>",
-	Short: "create new notes markdown with templates.",
-	Long: `
+	Use:   "notes <target-name> <target-ip>",
+	Short: "Create a structured markdown notes template",
+	Long: `Create a new markdown file with a comprehensive template for 
+penetration testing notes, including common commands and checklists.
 
-	██████╗ ██╗  ██╗██╗  ██╗ █████╗  ██████╗██╗  ██╗
-	██╔══██╗╚██╗██╔╝██║  ██║██╔══██╗██╔════╝██║ ██╔╝
-	██████╔╝ ╚███╔╝ ███████║███████║██║     █████╔╝ 
-	██╔══██╗ ██╔██╗ ██╔══██║██╔══██║██║     ██╔═██╗ 
-	██║  ██║██╔╝ ██╗██║  ██║██║  ██║╚██████╗██║  ██╗
-	╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝	
-	`,
+This will:
+1. Create a directory with the specified target name
+2. Generate a markdown file with a template inside that directory
+3. Fill in the IP address and target name in appropriate locations
+
+Examples:
+  rx create notes MyTarget 10.10.10.10
+  rx create notes HackTheBox 172.16.10.2
+
+Parameters:
+  <target-name>  Name of the target/challenge (used for directory and file naming)
+  <target-ip>    IP address of the target machine`,
 	Args: cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 

@@ -19,16 +19,21 @@ var shellFS embed.FS
 // shellCmd represents the shell command
 var shellCmd = &cobra.Command{
 	Use:   "shell <type>",
-	Short: "create shells for use.",
-	Long: `
+	Short: "Generate reverse shell payloads",
+	Long: `Generate reverse shell payloads in different languages.
 
-	██████╗ ██╗  ██╗██╗  ██╗ █████╗  ██████╗██╗  ██╗
-	██╔══██╗╚██╗██╔╝██║  ██║██╔══██╗██╔════╝██║ ██╔╝
-	██████╔╝ ╚███╔╝ ███████║███████║██║     █████╔╝ 
-	██╔══██╗ ██╔██╗ ██╔══██║██╔══██║██║     ██╔═██╗ 
-	██║  ██║██╔╝ ██╗██║  ██║██║  ██║╚██████╗██║  ██╗
-	╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝	
-	`,
+Available shell types:
+  php     - PHP reverse shell (saved as shell.php)
+  python  - Python reverse shell (saved as shell.py)
+  py      - Alias for python
+  bash    - Bash reverse shell (saved as shell.sh)
+  bin     - C source for compiled reverse shell (saved as revshell.c)
+
+Examples:
+  rx create shell php --LHOST 10.0.0.1 --LPORT 4444
+  rx create shell python --LHOST 10.0.0.1 --LPORT 4444
+  rx create shell bash --LHOST 10.0.0.1 --LPORT 4444
+  rx create shell bin --LHOST 10.0.0.1 --LPORT 4444`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 

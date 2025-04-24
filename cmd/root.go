@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 RON AMOSA <ron@cloudbuilder.io>
-
 */
 package cmd
 
@@ -13,20 +12,20 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "rx",
-	Short: "rx hackthebox, tryhackme, helper cli tool.",
-	Long: `rx hackers helper tool...
+	Short: "A CLI helper tool for penetration testing and CTF challenges",
+	Long: `rx-cli - A hacker's helper tool for CTF challenges like HackTheBox and TryHackMe
 
-	██████╗ ██╗  ██╗██╗  ██╗ █████╗  ██████╗██╗  ██╗
-	██╔══██╗╚██╗██╔╝██║  ██║██╔══██╗██╔════╝██║ ██╔╝
-	██████╔╝ ╚███╔╝ ███████║███████║██║     █████╔╝ 
-	██╔══██╗ ██╔██╗ ██╔══██║██╔══██║██║     ██╔═██╗ 
-	██║  ██║██╔╝ ██╗██║  ██║██║  ██║╚██████╗██║  ██╗
-	╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
-	`,
+Automates common setup tasks such as creating note templates, 
+generating reverse shells, and organizing your hacking workflow.
+
+Examples:
+  rx create notes MyTarget 10.10.10.10
+  rx create shell php --LHOST 10.10.14.20 --LPORT 443
+`,
 	CompletionOptions: cobra.CompletionOptions{
 		DisableDefaultCmd: true,
 	},
-	Version: "0.0.1",
+	Version: "0.0.2",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

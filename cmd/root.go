@@ -11,7 +11,7 @@ import (
 
 // Version information
 const (
-	Version   = "0.0.3" // Set this to match release tags
+	Version   = "0.0.4" // Set this to match release tags
 	BuildTime = "2023-11-14"
 )
 

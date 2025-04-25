@@ -30,3 +30,6 @@ shell.php
 shell.py
 shell.sh
 revshell.c
+
+# Development tools
+actionlint

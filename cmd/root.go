@@ -11,8 +11,8 @@ import (
 
 // Version information
 const (
-	Version   = "0.0.2" // Set this to match release tags
-	BuildTime = "2025-04-24"
+	Version   = "0.0.3" // Set this to match release tags
+	BuildTime = "2023-11-14"
 )
 
 // rootCmd represents the base command when called without any subcommands
